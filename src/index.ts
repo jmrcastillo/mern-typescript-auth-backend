@@ -6,13 +6,12 @@ import compression from 'compression';
 import cors from 'cors';
 import mongoose from 'mongoose';
 
-
 // Router
 import router from './router';
-
+// DB
+import connectDb from './config/db';
 
 const app = express();
-
 
 app.use(cors({
   credentials: true,
@@ -23,20 +22,14 @@ app.use(cookieParser());
 // Postman API Post GET
 app.use(bodyParser.json());
 
-
 const server = http.createServer(app);
 
 server.listen(8080, () => {
   console.log('Server running on http://localhost:8080/')
 })
 
-// MongoDB Setup
-const MONGO_URL = 'mongodb+srv://jm:jm2024@cluster0.nlu97nj.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0'
-
-mongoose.Promise = Promise;
-mongoose.connect(MONGO_URL);
-mongoose.connection.on('error Connecting Jibreel', (error: Error) => console.log(error))
-
+// Connect DB
+connectDb()
 
 // Routes
 app.use('/', router());
