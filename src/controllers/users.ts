@@ -3,7 +3,7 @@
 import express from 'express';
 
 
-import { deleteUserById, getUsers, getUserById } from '../db/users';
+import { deleteUserById, getUsers, getUserById } from '../models/users';
 
 
 // Get all User
