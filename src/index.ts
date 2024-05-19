@@ -6,6 +6,8 @@ import compression from 'compression';
 import cors from 'cors';
 import mongoose from 'mongoose';
 
+import chalk from 'chalk';
+
 // Router
 import router from './router';
 // DB
@@ -25,7 +27,7 @@ app.use(bodyParser.json());
 const server = http.createServer(app);
 
 server.listen(8080, () => {
-  console.log('Server running on http://localhost:8080/')
+  console.log(chalk.blue('Server running on http://localhost:8080/'))
 })
 
 // Connect DB

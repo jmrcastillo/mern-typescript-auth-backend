@@ -2,6 +2,7 @@ import express from 'express';
 
 import { getUserByEmail, createUser } from '../models/users';
 import { random, authentication } from '../helpers';
+import Logging from '../library/Logging';
 
 
 // Login Controller
@@ -11,13 +12,14 @@ export const login = async (req: express.Request, res: express.Response) => {
     const { email, password } = req.body;
     // Check if there is an email and password
     if (!email || !password) {
-      console.log("Please Enter Your Email and Password")
+      Logging.warning("Enter your Email and Password")
       return res.sendStatus(400)
     }
 
     // user - to access authentication and salt
     const user = await getUserByEmail(email).select('+authentication.salt +authentication.password');
     if (!user) {
+      Logging.warning("Unregister User")
       return res.sendStatus(400);
     }
 
@@ -26,7 +28,7 @@ export const login = async (req: express.Request, res: express.Response) => {
 
     // Check if password is not equal to hash
     if (user.authentication.password != expectedHash) {
-      console.log("Invalid Hash")
+      Logging.warning("Invalid Hash")
       return res.sendStatus(403);
     }
 
@@ -38,11 +40,12 @@ export const login = async (req: express.Request, res: express.Response) => {
 
     // Set Cookie
     res.cookie('JM-AUTH', user.authentication.sessionToken, { domain: 'localhost', path: '/' });
+    Logging.info("Succesfully Login")
 
     return res.status(200).json(user).end();
 
   } catch (error) {
-    console.log(error)
+    Logging.error(error)
     return res.sendStatus(400)
   }
 }
@@ -61,17 +64,17 @@ export const register = async (req: express.Request, res: express.Response) => {
 
     // Check if all field is present
     if (!email || !password || !username) {
-      console.log("ONe or more fields are missing. Sending 400 status...")
+      Logging.warning("One or more fieds are missing. Sending 400 status...")
       return res.sendStatus(400);
     } else {
-      console.log("All fields present. Proceeding with the next steps...")
+      Logging.info("All fields present. Proceeding with the next steps...")
     }
 
     // Check if the user exist
     const existingUser = await getUserByEmail(email)
 
     if (existingUser) {
-      console.log("User already exist")
+      Logging.warning("User already exist")
       return res.sendStatus(400)
     }
 
@@ -86,15 +89,13 @@ export const register = async (req: express.Request, res: express.Response) => {
         password: authentication(salt, password),
       },
     });
-    console.log("User Created")
-    console.log(user)
+    Logging.info("User Created")
 
     return res.status(200).json(user).end()
     //return res.status(200)
 
   } catch (error) {
-    console.log("Jibreel Error")
-    console.log(error)
+    Logging.error(error)
     return res.sendStatus(400);
   }
 }
